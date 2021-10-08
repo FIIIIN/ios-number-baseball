@@ -6,31 +6,34 @@
 
 import Foundation
 
-var randomNumbers: [Int] = []
+var computerNumbers: [Int] = []
 var chancesLeft: Int = 9
 var randomNumberAmount = 3
-
+var userNumbers: [Int] = []
 class BaseballGame {
   
-    var computerNumbers: [Int] = []
-    var userNumbers: [Int] = []
-    var userTrueAndComputerFalse: Bool = true
-
-    func extractRandomNumber(randomNumberAmount:Int = randomNumberAmount ,isUser userTrueAndComputerFalse: Bool) -> [Int] {
-        randomNumbers = []
+    func extractRandomNumber(randomNumberAmount:Int = randomNumberAmount) -> [Int] {
+        computerNumbers = []
         let randomNumberRange = 1...9
 
-        while randomNumbers.count != randomNumberAmount {
-            randomNumbers.append(Int.random(in: randomNumberRange))
-            randomNumbers = Array(Set(randomNumbers))
+        while computerNumbers.count != randomNumberAmount {
+            computerNumbers.append(Int.random(in: randomNumberRange))
+            computerNumbers = Array(Set(computerNumbers))
         }
-        if userTrueAndComputerFalse == true {
-            userNumbers = randomNumbers
-        } else {
-            computerNumbers = randomNumbers
-        }
-        return randomNumbers
+      
+        return computerNumbers
     }
+    func extractUserNumber(){
+        guard let userNumber = readLine() , userNumber != "" else{
+            fatalError("입력이 잘못되었습니다.")
+        }
+        guard let userNumberInt = Int(userNumber) else{
+            fatalError("입력이 잘못되었습니다.")
+        }
+        userNumbers = userNumberInt.split(separator: " ").map{ Int($0) }
+    }
+    
+    
     
     func countStrikeAndBall() -> (strike: Int, ball:Int) {
         var sameNumber:[Int] = []
@@ -47,10 +50,10 @@ class BaseballGame {
     }
     
     init() {
-        extractRandomNumber(isUser: false)
+        extractRandomNumber()
     
         while chancesLeft > 0{
-            let users = extractRandomNumber(isUser: true)
+            let users = extractRandomNumber() // 유저넘버 넣기
             let mappedUsers = users.map{ String($0) }
             let printUserNumber = mappedUsers.joined(separator: " ")
             let strikeAndBall = countStrikeAndBall()
@@ -58,6 +61,30 @@ class BaseballGame {
             print("\(strikeAndBall.strike) 스트라이크, \(strikeAndBall.ball) 볼")
             print("남은 기회 : \(chancesLeft)")
             (chancesLeft == 0 && strikeAndBall.strike != 3) ? print("컴퓨터승리...!") : strikeAndBall.strike == 3 ? chancesLeft = 0 : nil
+        }
+    }
+}
+
+class MenuHandler{
+    enum menuNumbers:Int{
+        case one = 1
+        case two = 2
+    }
+    func chooseMenu(){
+        print("1. 게임시작")
+        print("2. 게임종료")
+        print("원하는 기능을 선택해주세요 : ", terminator: "")
+        guard let menuChosen = readLine() , menuChosen != "" else{
+            fatalError("입력이 잘못되었습니다.")
+        }
+        guard let menuChosenInt = Int(menuChosen) else{
+            fatalError("입력이 잘못되었습니다.")
+        }
+        
+        switch menuNumbers (rawValue:menuChosenInt) {
+        case .one : BaseballGame()
+        case .two : break
+        case .none : break
         }
     }
 }
